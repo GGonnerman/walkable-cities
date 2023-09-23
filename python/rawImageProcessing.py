@@ -6,40 +6,29 @@ from osgeo.gdalconst import *
 import os
 import json
 import numpy as np
+#Imports
 
-#os.chdir(r"../../Map Data")
-
+#Sets gdal maping software to use exceptions
 gdal.UseExceptions()
 
-#print("IGNORE THAT" + "\n"*5)
-
+#Set file location of maping data
 file_name = input("file name: ")
 ds = gdal.Open(f"../../Map Data/{file_name}")
 
+#Properly orient data
 band = ds.GetRasterBand(1)
-
 elevation = band.ReadAsArray()
 
+#Round data to lessen storage inpact
 elevation = (np.round(elevation, 0)).astype(int)
 
-import matplotlib.pyplot as plt
+#Zoom in photo
+elevation = elevation[3500:7000, 3500:7000]
 
-#print(elevation)
-
-elevation = elevation[4500:5500, 4500:5500]
-#elevation = [row[4500:5500] for row in elevation]
-
-#plt.imshow(elevation, cmap="gist_earth")
-#plt.show()
-
+#Transforms from numpy to list
 elevation_list = elevation.tolist()
 
+#Save data as json file
 file_path = "elevationData.json"
 with open(file_path, 'w') as f:
     json.dump({"data": elevation_list}, f)
-
-
-#[{x} for i in elevation]
-
-#print(elevation)
-
