@@ -1,0 +1,46 @@
+%Open and read json file containing height information
+fname = 'IowaCityHeight2.json'; 
+fid = fopen(fname); 
+raw = fread(fid,inf); 
+str = char(raw'); 
+fclose(fid); 
+val = jsondecode(str);
+
+%Set value for how large the json file is
+resolution = 250;
+
+
+
+square = zeros(250,250);
+for i = size(square, 1)
+    for j = size(square, 2)
+        square(i,j)=j;
+    end
+end
+
+%disp(square)
+
+%Initalize the graph
+graph = scatter3(square, square, val.data);
+
+%Set Colors
+%set(graph, 'edgecolor', 'none');
+%colormap(GrassColorThree)
+
+%Turn axis' off
+%axis off
+
+%Save image
+%saveas(gcf,'ColoredAlternate.png')
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,18 @@
+fname = 'elevationData.json'; 
+fid = fopen(fname); 
+raw = fread(fid,inf); 
+str = char(raw'); 
+fclose(fid); 
+val = jsondecode(str);
+
+resolution = 250;
+
+graph = pcolor(1:resolution, 1:resolution, val.data);
+set(graph, 'edgecolor', 'none');
+
+colormap(GrassColor)
+
+axis off
+
+saveas(gcf,'IowaCityColored2.png')
+
