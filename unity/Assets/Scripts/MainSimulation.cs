@@ -12,6 +12,7 @@ public class MainSimulation : MonoBehaviour
 {
     public GameObject antPrefab;
     public GameObject buildingPrefab;
+    public GameObject roadPrefab;
     public Material trainMaterial;
     public Material houseMaterial;
     public Material hospitalMaterial;
@@ -32,12 +33,10 @@ public class MainSimulation : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ant = Instantiate(antPrefab, new Vector3(50, 0, 50), Quaternion.identity);
-        Debug.Log(ant);
-
         pd = JsonConvert.DeserializeObject<PathingData>(jsonFile.text);
         Debug.LogError(pd.path_data[0][1]);
         Debug.Log(pd.location_data);
+        Debug.Log(pd.list_of_edges);
 
         foreach (var item in pd.location_data)
         {
@@ -46,7 +45,7 @@ public class MainSimulation : MonoBehaviour
             int[] location = item.Value;
             Debug.Log(location);
             Debug.Log(location[0]);
-            GameObject building = Instantiate(buildingPrefab, new Vector3(location[0], 0.5f, location[1]), Quaternion.identity);
+            GameObject building = Instantiate(buildingPrefab, new Vector3(location[0], 2f, location[1]), Quaternion.identity);
             Material buildingType;
 
             switch(name)
@@ -77,6 +76,24 @@ public class MainSimulation : MonoBehaviour
             building.GetComponent < MeshRenderer >().material = buildingType;
         }
 
+        ant = Instantiate(antPrefab, new Vector3(pd.path_data[destinationIndex][0], 1, pd.path_data[destinationIndex][1]), Quaternion.identity);
+        destinationIndex++;
+        Debug.Log(ant);
+
+        Debug.Log("About to print edges");
+        Debug.Log(pd.list_of_edges);
+        foreach (var edge in pd.list_of_edges)
+        {
+            //Debug.Log(edge);
+            //Debug.Log(edge[0]);
+            //Debug.Log(edge[0][0]);
+            Vector2 start = new Vector2(edge[0][0], edge[0][1]);
+            Vector2 end = new Vector2(edge[1][0], edge[1][1]);
+
+            GameObject road = Instantiate(roadPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            road.GetComponent<Road>().SetEndpoints(start, end);
+
+        }
 
         Vector3 destination = new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]);
         Debug.Log(destination);

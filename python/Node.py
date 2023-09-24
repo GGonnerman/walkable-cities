@@ -1,3 +1,4 @@
+import uuid
 from Edge import Edge
 
 class Node:
@@ -6,6 +7,7 @@ class Node:
         self.name = name
         self.connections = []
         self.destinations = []
+        self.id = str(uuid.uuid4())
     
     def __str__(self):
         return f"{self.name}: [{self.location.y}][{self.location.x}]"

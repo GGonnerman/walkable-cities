@@ -17,7 +17,7 @@ public class Ant : MonoBehaviour
         //Vector3 location = new Vector3(UnityEngine.Random.Range(-10.0f, 10.0f), 0, UnityEngine.Random.Range(-10.0f, 10.0f));
         //Vector3 location = new Vector3(50, 0, 50);
 
-        // Be flat on the floor
+        // Be sideways on the floor
         Quaternion rotation = Quaternion.identity;
         rotation.eulerAngles = new Vector3(0, 0, 90);
         //rotation.eulerAngles = new Vector3(0, UnityEngine.Random.Range(-90f, 90f), 90);
