@@ -14,6 +14,7 @@ import json
 import math
 from WeightedGraph import WeightedGraph
 from Node import Node
+from Location import Location
 
 random.seed(1)
 
@@ -22,29 +23,25 @@ elevation_data = None
 with open("IowaCityHeight2.json", "r") as f:
     elevation_data = json.load(f)['data']
 
-width = len(elevation_data)
-height = len(elevation_data[0])
+row_count = len(elevation_data)
+column_count = len(elevation_data[0])
 
 building_size = 15
 building_radius = math.ceil( ((building_size/2)**2 + (building_size/2)**2)**0.5 )
 
-# Get the euclidean distance between two 2d vectors.  
-def distance_between(first_location, second_location):
-    return ( (first_location[0] - second_location[0])**2 + (first_location[1] - second_location[1])**2 )**0.5
-
 # Check if this potential location is touching an existing building 
 def has_building_collisions(potential_location):
     for location in locations:
-        if distance_between(location, potential_location) < (2.1*building_radius):
+        if location.distance_from(potential_location) < (2.1*building_radius):
             return True
     return False
 
 def get_random_location():
     # Figure out water and edges later
-    potential_location = [random.randrange(building_radius, height - building_radius), random.randrange(building_radius, width - building_radius)]
+    potential_location = Location(random.randrange(building_radius, row_count - building_radius), random.randrange(building_radius, column_count - building_radius))
 
     while has_building_collisions(potential_location):
-        potential_location = [random.randrange(building_radius, height - building_radius), random.randrange(building_radius, width - building_radius)]
+        potential_location = Location(random.randrange(building_radius, row_count - building_radius), random.randrange(building_radius, column_count - building_radius))
     
     return potential_location
 
@@ -127,9 +124,13 @@ print("Okay. My Final path is")
 for node in final_path:
     print(node)
 
+serializable_buildings = {}
+for name, location in zip(names, locations):
+    serializable_buildings[name] = [location.x, location.y]
+
 final_path = {
-    "location_data": buildings,
-    "path_data": [[node.x, node.y] for node in final_path]
+    "location_data": serializable_buildings,
+    "path_data": [[node.location.x, node.location.y] for node in final_path]
 }
 
 with open("prims-algorithm.json", "w") as f:
