@@ -273,13 +273,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1f2d1b719517d4408898b1e1713a0fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  antPrefab: {fileID: 6548623324157269200, guid: 1119d237bcec87d499f5ee0d28fffecb,
+  salesmenPrefab: {fileID: 0}
+  buildingPrefab: {fileID: 1845716697551358984, guid: c334d008474a7174ab781940fa704c98,
     type: 3}
-  buildingPrefab: {fileID: 3912591752262964881, guid: c0d8be22d92e1ba4596653aa509babe6,
+  roadPrefab: {fileID: 6526799647999082526, guid: ff1712d10508b0d40823df608b40986d,
     type: 3}
+  trainMaterial: {fileID: 0}
+  houseMaterial: {fileID: 2100000, guid: 52a723ebfcf952e4a931ea5d6939d266, type: 2}
+  hospitalMaterial: {fileID: 2100000, guid: b199ed87c3099204dbd53106010763d9, type: 2}
+  policeStationMaterial: {fileID: 2100000, guid: b00d20480a7ee314c83df39ec596e509,
+    type: 2}
+  fireStationMaterial: {fileID: 0}
+  shopMaterial: {fileID: 0}
+  capitalBuildingMaterial: {fileID: 2100000, guid: 1a105210fc5e1c348943b7c607910418,
+    type: 2}
   speed: 20
   tolerance: 2.5
-  antCount: 1
+  salesmenCount: 0
   jsonFile: {fileID: 4900000, guid: 1eee6dd95f44b2142928e1cf56a7b5f6, type: 3}
 --- !u!1 &410087039
 GameObject:
@@ -509,7 +519,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 98a0fe113bbf99846b03766abb97ad64, type: 2}
+  - {fileID: 2100000, guid: c315fb398f004ed4dae43e4e2fc56d78, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

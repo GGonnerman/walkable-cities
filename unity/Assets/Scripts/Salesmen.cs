@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor.UI;
 using UnityEngine;
 
-public class Ant : MonoBehaviour
+public class Salesmen : MonoBehaviour
 {
 
     private float speed = 10f;

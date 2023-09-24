@@ -10,7 +10,7 @@ using static UnityEditor.Rendering.CameraUI;
 
 public class MainSimulation : MonoBehaviour
 {
-    public GameObject antPrefab;
+    public GameObject salesmenPrefab;
     public GameObject buildingPrefab;
     public GameObject roadPrefab;
     public Material trainMaterial;
@@ -22,12 +22,12 @@ public class MainSimulation : MonoBehaviour
     public Material capitalBuildingMaterial;
     public float speed;
     public float tolerance;
-    private GameObject ant;
-    public int antCount;
+    private GameObject salesmen;
+    public int salesmenCount;
     public TextAsset jsonFile;
-    private List<GameObject> ants = new List<GameObject>();
+    private List<GameObject> samesmens = new List<GameObject>();
     private int destinationIndex = 0;
-    private bool antExists = true;
+    private bool salesmenExists = true;
     PathingData pd;
 
     // Start is called before the first frame update
@@ -76,9 +76,9 @@ public class MainSimulation : MonoBehaviour
             building.GetComponent < MeshRenderer >().material = buildingType;
         }
 
-        ant = Instantiate(antPrefab, new Vector3(pd.path_data[destinationIndex][0], 1, pd.path_data[destinationIndex][1]), Quaternion.identity);
+        salesmen = Instantiate(salesmenPrefab, new Vector3(pd.path_data[destinationIndex][0], 1, pd.path_data[destinationIndex][1]), Quaternion.identity);
         destinationIndex++;
-        Debug.Log(ant);
+        Debug.Log(salesmen);
 
         Debug.Log("About to print edges");
         Debug.Log(pd.list_of_edges);
@@ -97,13 +97,13 @@ public class MainSimulation : MonoBehaviour
 
         Vector3 destination = new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]);
         Debug.Log(destination);
-        ant.GetComponent<Ant>().SetDestination(destination);
-        ant.GetComponent<Ant>().SetSpeed(speed);
+        salesmen.GetComponent<Salesmen>().SetDestination(destination);
+        salesmen.GetComponent<Salesmen>().SetSpeed(speed);
         /*for(int i = 0;  i < antCount; i++)
         {
-            GameObject ant = Instantiate(antPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            ants.Add(ant);
-            ant.GetComponent<Ant>().SetDestination(new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]));
+            GameObject salesmen = Instantiate(salesmenPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            salesmens.Add(ant);
+            salesmen.GetComponent<Salesmen>().SetDestination(new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]));
 
         }*/
     }
@@ -111,22 +111,22 @@ public class MainSimulation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log(ant);
-        //Debug.Log(ant.GetComponent<Ant>());
-        if(antExists)
+        //Debug.Log(salesmen);
+        //Debug.Log(salesmen.GetComponent<Salesmen>());
+        if(salesmenExists)
         {
 
-            if(ant.GetComponent<Ant>().IsAtDestination() )
+            if(salesmen.GetComponent<Salesmen>().IsAtDestination() )
             {
                 destinationIndex += 1;
                 if (destinationIndex >= pd.path_data.Length)
                 {
-                    Destroy(ant);
-                    antExists = false;
+                    Destroy(salesmen);
+                    salesmenExists = false;
                 }
                 else
                 {
-                    ant.GetComponent<Ant>().SetDestination(new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]));
+                    salesmen.GetComponent<Salesmen>().SetDestination(new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]));
                 }
             }
 
