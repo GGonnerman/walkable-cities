@@ -24,7 +24,10 @@ public class Road : MonoBehaviour
         newRotation.eulerAngles = new Vector3(0, yRotation, 90);
         transform.rotation = newRotation;
         Debug.Log("About to scale");
-        transform.localScale += new Vector3(0, Vector2.Distance(start, end) / 2, 0);
+        float distance = Vector2.Distance(start, end);
+        transform.localScale += new Vector3(0, distance / 2, 0);
+
+        GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(1, distance / 2);
     }
 
     // Update is called once per frame
