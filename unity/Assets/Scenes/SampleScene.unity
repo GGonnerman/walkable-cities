@@ -274,20 +274,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chosenCity: 2
+  isLayered: 0
   salesmenPrefab: {fileID: 6457003073317570254, guid: 581d6ed653af41b4e92b3616cf55fd63,
     type: 3}
   buildingPrefab: {fileID: 7403758495662617446, guid: bb366fe9eaaa6b84b8b8f0e1c2e63fd7,
     type: 3}
   roadPrefab: {fileID: 6526799647999082526, guid: ff1712d10508b0d40823df608b40986d,
     type: 3}
-  trainMaterial: {fileID: 0}
+  trainMaterial: {fileID: 2100000, guid: 6dbdea2836913a94ca67371497ad254d, type: 2}
   houseMaterial: {fileID: 2100000, guid: 52a723ebfcf952e4a931ea5d6939d266, type: 2}
   hospitalMaterial: {fileID: 2100000, guid: b199ed87c3099204dbd53106010763d9, type: 2}
   policeStationMaterial: {fileID: 2100000, guid: b00d20480a7ee314c83df39ec596e509,
     type: 2}
-  fireStationMaterial: {fileID: 0}
-  shopMaterial: {fileID: 0}
+  fireStationMaterial: {fileID: 2100000, guid: ff70156268aeabe4ea3e7773dbc58cb0, type: 2}
+  shopMaterial: {fileID: 2100000, guid: 60884bfe0c4de9a42abae42b9f9d7406, type: 2}
+  apartmentMaterial: {fileID: 2100000, guid: e3627c1f856c2ba4d90ab40d188d23fc, type: 2}
   capitalBuildingMaterial: {fileID: 2100000, guid: 1a105210fc5e1c348943b7c607910418,
+    type: 2}
+  gardnerMuseumMaterial: {fileID: 2100000, guid: 8686c44f21281ca49bfbb2facfd594e4,
     type: 2}
   speed: 20
   tolerance: 2.5
@@ -295,12 +299,17 @@ MonoBehaviour:
   iowaPrims: {fileID: 4900000, guid: db379688128324a48a3667b4d6368754, type: 3}
   iowaElevation: {fileID: 4900000, guid: 5e932defe16a1ca45a18d51b1385c00f, type: 3}
   iowaMaterial: {fileID: 2100000, guid: c315fb398f004ed4dae43e4e2fc56d78, type: 2}
+  iowaLayeredMaterial: {fileID: 2100000, guid: a0cb624af1321fe47b4d0b3d4a125717, type: 2}
   bostonPrims: {fileID: 4900000, guid: bb77a9ccab3d8f14792eac88580951ea, type: 3}
   bostonElevation: {fileID: 4900000, guid: a0030e2e93ec422489f8d5d105922d12, type: 3}
   bostonMaterial: {fileID: 2100000, guid: f998ebc4d7eda7d42a2e57285f6d5884, type: 2}
+  bostonLayeredMaterial: {fileID: 2100000, guid: 5202c1a905ddaf340b05cffbb24794e2,
+    type: 2}
   detroitPrims: {fileID: 4900000, guid: 8ec1ab8d6ff2f4d44bd5e66700ff9ec2, type: 3}
   detroitElevation: {fileID: 4900000, guid: bf87ae2d7e3067044a56f91b8b9c9283, type: 3}
-  detroidMaterial: {fileID: 2100000, guid: f2be3a028693df145a47c4e7041579bc, type: 2}
+  detroitMaterial: {fileID: 2100000, guid: f2be3a028693df145a47c4e7041579bc, type: 2}
+  detroitLayeredMaterial: {fileID: 2100000, guid: f1fcb2ab406988f49ac6c5e4e344e9bf,
+    type: 2}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0

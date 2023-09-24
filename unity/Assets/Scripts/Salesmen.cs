@@ -12,29 +12,18 @@ public class Salesmen : MonoBehaviour
     private float augmentedSpeed = 20f;
     private float tolerance = 1f;
     private Vector3 destination;
-    // Start is called before the first frame update
+
     void Start()
     {
-        // Spawn in a random location
-        //Vector3 location = new Vector3(UnityEngine.Random.Range(-10.0f, 10.0f), 0, UnityEngine.Random.Range(-10.0f, 10.0f));
-        //Vector3 location = new Vector3(50, 0, 50);
-
         // Be sideways on the floor
         Quaternion rotation = Quaternion.identity;
         rotation.eulerAngles = new Vector3(0, 0, 90);
-        //rotation.eulerAngles = new Vector3(0, UnityEngine.Random.Range(-90f, 90f), 90);
-
-        // Set to use location and rotation
-        //transform.position = location;
         transform.rotation = rotation;
-
         LookAt(destination);
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
-        //transform.position += transform.forward * Time.deltaTime * movementSpeed;
         MoveFoward();
     }
 
@@ -43,49 +32,46 @@ public class Salesmen : MonoBehaviour
         this.speed = speed;
     }
 
+    // Update tolerance to destination before having "arrived"
     public void SetTolerance(float tolerance)
     {
         this.tolerance = tolerance;
     }
 
+    // Move forward with our current angle scaling for change in time and augmentedSpeed (speed with elevation gradient factored in) 
     private void MoveFoward()
     {
-
         float angle = transform.rotation.eulerAngles.y * Mathf.PI / 180;
         transform.position += new Vector3(
             Mathf.Cos(angle) * augmentedSpeed * Time.deltaTime,
             0,
             -Mathf.Sin(angle) * augmentedSpeed * Time.deltaTime
         );
-        // TODO: Check for overflow
-        // x = sin(angle) * speed * deltaTime
-        // z = cos(angle) * speed * deltaTime
-
     }
 
+    // Use math to look at an abstract vector in 3d space
     public void LookAt(Vector3 lookLocation)
     {
-        Debug.Log("Running Look at function");
         float yRotation = 90f + (Mathf.Atan2(gameObject.transform.position.x - lookLocation.x, gameObject.transform.position.z - lookLocation.z) * 180 / Mathf.PI);
-        Debug.Log("Rotation is " + yRotation);
         Quaternion newRotation = Quaternion.identity;
         newRotation.eulerAngles = new Vector3(0, yRotation, 90);
         gameObject.transform.rotation = newRotation;
     }
 
+    // Add the current destination (the place to look)
     public void SetDestination(Vector3 destination)
     {
         this.destination = destination;
-        Debug.Log("Set destionation to " + destination);
         LookAt(destination);
     }
 
+    // Update augmented speed based on the difficulty (or ease) of the elevation change
     public void SetDifficulty(float difficulty)
     {
         augmentedSpeed = speed + 0.5f * difficulty * speed;
-        Debug.Log("Difficult set to " + difficulty.ToString() + "meaning augmented speed is " + augmentedSpeed.ToString() );
     }
 
+    // Check if within a tolerance of overall destination
     public bool IsAtDestination()
     {
         if ((transform.position - destination).magnitude < tolerance)

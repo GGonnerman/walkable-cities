@@ -15,6 +15,7 @@ class Node:
     def __repr__(self):
         return f"{self.name}: [{self.location.y}][{self.location.x}]"
     
+    # Add a 1-way connection to another node and store that as an edge (and resort edges short-large)
     def add_connection(self, node):
         self.connections.append(Edge(self, node))
         self.connections.sort(key=lambda x: x.distance )

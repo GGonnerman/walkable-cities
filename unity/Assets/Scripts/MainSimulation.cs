@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Xml;
 using Newtonsoft.Json;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using static UnityEditor.FilePathAttribute;
 using static UnityEditor.Rendering.CameraUI;
@@ -12,6 +13,7 @@ using static UnityEditor.Rendering.CameraUI;
 public class MainSimulation : MonoBehaviour
 {
     public City chosenCity;
+    public bool isLayered;
     public GameObject salesmenPrefab;
     public GameObject buildingPrefab;
     public GameObject roadPrefab;
@@ -21,7 +23,9 @@ public class MainSimulation : MonoBehaviour
     public Material policeStationMaterial;
     public Material fireStationMaterial;
     public Material shopMaterial;
+    public Material apartmentMaterial;
     public Material capitalBuildingMaterial;
+    public Material gardnerMuseumMaterial;
     public float speed;
     public float tolerance;
     private GameObject salesmen;
@@ -29,21 +33,24 @@ public class MainSimulation : MonoBehaviour
     public TextAsset iowaPrims;
     public TextAsset iowaElevation;
     public Material iowaMaterial;
+    public Material iowaLayeredMaterial;
     public TextAsset bostonPrims;
     public TextAsset bostonElevation;
     public Material bostonMaterial;
+    public Material bostonLayeredMaterial;
     public TextAsset detroitPrims;
     public TextAsset detroitElevation;
-    public Material detroidMaterial;
+    public Material detroitMaterial;
+    public Material detroitLayeredMaterial;
     private List<GameObject> samesmens = new List<GameObject>();
     private int destinationIndex = 0;
     private bool salesmenExists = true;
-    HeightData height_json;
+    HeightData heightJson;
     private int[][] height_data;
     private int highestPoint = -1;
     private int lowestPoint = 20000;
     private int elevationDelta;
-    PathingData pd;
+    PathingData pathingJson;
 
     public enum City {
         Iowa,
@@ -58,59 +65,59 @@ public class MainSimulation : MonoBehaviour
         TextAsset elevationFile = null;
         Material groundMaterial = null;
 
+        // Set the prims pathfinding file, elevation file, and ground material based on the user-chosen city and layer style
         if(chosenCity == City.Iowa)
         {
             primsFile = iowaPrims;
             elevationFile = iowaElevation;
-            groundMaterial = iowaMaterial;
-
+            groundMaterial = isLayered ? iowaLayeredMaterial : iowaMaterial;
         }
         else if(chosenCity == City.Detroit)
         {
             primsFile = detroitPrims;
             elevationFile = detroitElevation;
-            groundMaterial = detroidMaterial;
+            groundMaterial = isLayered ? detroitLayeredMaterial : detroitMaterial;
         }
         else if(chosenCity == City.Boston)
         {
             primsFile = bostonPrims;
             elevationFile = bostonElevation;
-            groundMaterial = bostonMaterial;
+            groundMaterial = isLayered ? bostonLayeredMaterial : bostonMaterial;
         }
         else
         {
             Debug.LogError("No Valid City Chosen");
         }
 
-        pd = JsonConvert.DeserializeObject<PathingData>(primsFile.text);
-        height_json = JsonConvert.DeserializeObject<HeightData>(elevationFile.text);
         GameObject ground = GameObject.Find("Plane");
         ground.GetComponent<MeshRenderer>().material = groundMaterial;
+        pathingJson = JsonConvert.DeserializeObject<PathingData>(primsFile.text);
+        heightJson = JsonConvert.DeserializeObject<HeightData>(elevationFile.text);
 
-        for (int i = 0; i < height_json.data.Length; i++)
+        // Get the high and low bounds of elevation for normalizing the gradient
+        for (int i = 0; i < heightJson.data.Length; i++)
         {
-            for(int j = 0; j < height_json.data[i].Length; j++)
+            for(int j = 0; j < heightJson.data[i].Length; j++)
             {
-                if (height_json.data[i][j] > highestPoint) {  highestPoint = height_json.data[i][j]; }
-                if (height_json.data[i][j] < lowestPoint) {  lowestPoint = height_json.data[i][j]; }
+                if (heightJson.data[i][j] > highestPoint) {  highestPoint = heightJson.data[i][j]; }
+                if (heightJson.data[i][j] < lowestPoint) {  lowestPoint = heightJson.data[i][j]; }
             }
         }
         elevationDelta = highestPoint - lowestPoint;
 
-        foreach (var item in pd.location_data)
+        // Create a new building for each item in location data
+        foreach (var item in pathingJson.location_data)
         {
             string name = item.Key;
-            Debug.Log("We have " + name);
             int[] location = item.Value;
-            Debug.Log(location);
-            Debug.Log(location[0]);
-            GameObject building = Instantiate(buildingPrefab, new Vector3(location[0], 2f, location[1]), Quaternion.identity);
+            Quaternion rotation = Quaternion.identity;
+            rotation.eulerAngles = new Vector3(0, 180, 0);
+            GameObject building = Instantiate(buildingPrefab, new Vector3(location[0], 2f, location[1]), rotation);
             Material buildingType;
 
+            // Set building material based on the building type
             switch(name)
             {
-                //case "train":
-                //    buildingType = trainMaterial;
                 case "house":
                     buildingType = houseMaterial;
                     break;
@@ -120,46 +127,69 @@ public class MainSimulation : MonoBehaviour
                 case "police_station":
                     buildingType = policeStationMaterial;
                     break;
-                //case "fire_station":
-                //    break;
-                //case "shop":
-                //    break;
+                case "fire_station":
+                    buildingType = fireStationMaterial;
+                    break;
+                case "train":
+                    buildingType = trainMaterial;
+                    break;
+                case "shop":
+                    buildingType = shopMaterial;
+                    break;
+                case "apartment":
+                    buildingType = apartmentMaterial;
+                    break;
                 case "capital_building":
-                    if(chosenCity == City.Iowa) {
+                    // Set the "special building" for each city
+                    if (chosenCity == City.Iowa)
+                    {
                         buildingType = capitalBuildingMaterial;
-                    } else
+                    }
+                    else if (chosenCity == City.Boston)
+                    {
+                        buildingType = gardnerMuseumMaterial;
+                    }
+                    else
                     {
                         buildingType = houseMaterial;
                     }
                     break;
                 default:
-                    buildingType = houseMaterial;
+                    // Random distribution of "common" buildings
+                    float randomValue = UnityEngine.Random.Range(0, 100f);
+                    if(randomValue < 20)
+                    {
+                        buildingType = shopMaterial;
+                    }
+                    else if (randomValue < 60)
+                    {
+                        buildingType = houseMaterial;
+                    }
+                    else
+                    {
+                        buildingType = apartmentMaterial;
+                    }
                     break;
             }
 
             building.GetComponent < MeshRenderer >().material = buildingType;
         }
 
-        salesmen = Instantiate(salesmenPrefab, new Vector3(pd.path_data[destinationIndex][0], 1, pd.path_data[destinationIndex][1]), Quaternion.identity);
+        // Create the salesmen at the first location, with a new destination and difficulty
+        salesmen = Instantiate(salesmenPrefab, new Vector3(pathingJson.path_data[destinationIndex][0], 1, pathingJson.path_data[destinationIndex][1]), Quaternion.identity);
         salesmen.GetComponent<Salesmen>().SetSpeed(speed);
         destinationIndex++;
 
         salesmen.GetComponent<Salesmen>().SetDifficulty (
             GetDifficulty(
-                height_json.data[ pd.path_data[destinationIndex - 1][1] ][ pd.path_data[destinationIndex - 1][1] ],
-                height_json.data[ pd.path_data[destinationIndex][1] ][ pd.path_data[destinationIndex][1] ]
+                heightJson.data[ pathingJson.path_data[destinationIndex - 1][1] ][ pathingJson.path_data[destinationIndex - 1][1] ],
+                heightJson.data[ pathingJson.path_data[destinationIndex][1] ][ pathingJson.path_data[destinationIndex][1] ]
             )
         );
 
-        Debug.Log(salesmen);
-
-        Debug.Log("About to print edges");
-        Debug.Log(pd.list_of_edges);
-        foreach (var edge in pd.list_of_edges)
+        // Draw each edge between 2 vertexes (houses) as a road
+        foreach (var edge in pathingJson.list_of_edges)
         {
-            //Debug.Log(edge);
-            //Debug.Log(edge[0]);
-            //Debug.Log(edge[0][0]);
             Vector2 start = new Vector2(edge[0][0], edge[0][1]);
             Vector2 end = new Vector2(edge[1][0], edge[1][1]);
 
@@ -168,42 +198,35 @@ public class MainSimulation : MonoBehaviour
 
         }
 
-        Vector3 destination = new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]);
+        Vector3 destination = new Vector3(pathingJson.path_data[destinationIndex][0], 0.5f, pathingJson.path_data[destinationIndex][1]);
         Debug.Log(destination);
         salesmen.GetComponent<Salesmen>().SetDestination(destination);
-        /*for(int i = 0;  i < antCount; i++)
-        {
-            GameObject salesmen = Instantiate(salesmenPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            salesmens.Add(ant);
-            salesmen.GetComponent<Salesmen>().SetDestination(new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]));
-
-        }*/
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log(salesmen);
-        //Debug.Log(salesmen.GetComponent<Salesmen>());
+        // Ensure salesmen hasn't completed his path
         if(salesmenExists)
         {
 
             if(salesmen.GetComponent<Salesmen>().IsAtDestination() )
             {
+                // If at destination,, update it and get a new difficult (elevation diff) for his new path
                 destinationIndex += 1;
-                if (destinationIndex >= pd.path_data.Length)
+                if (destinationIndex >= pathingJson.path_data.Length)
                 {
                     Destroy(salesmen);
                     salesmenExists = false;
                 }
                 else
                 {
-                    salesmen.GetComponent<Salesmen>().SetDestination(new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]));
+                    salesmen.GetComponent<Salesmen>().SetDestination(new Vector3(pathingJson.path_data[destinationIndex][0], 0.5f, pathingJson.path_data[destinationIndex][1]));
 
                     salesmen.GetComponent<Salesmen>().SetDifficulty (
                         GetDifficulty(
-                            height_json.data[ pd.path_data[destinationIndex - 1][1] ][ pd.path_data[destinationIndex - 1][0] ],
-                            height_json.data[ pd.path_data[destinationIndex][1] ][ pd.path_data[destinationIndex][0] ]
+                            heightJson.data[ pathingJson.path_data[destinationIndex - 1][1] ][ pathingJson.path_data[destinationIndex - 1][0] ],
+                            heightJson.data[ pathingJson.path_data[destinationIndex][1] ][ pathingJson.path_data[destinationIndex][0] ]
                         )
                     );
                 }

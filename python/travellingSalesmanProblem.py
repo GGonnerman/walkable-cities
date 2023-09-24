@@ -16,12 +16,13 @@ from WeightedGraph import WeightedGraph
 from Node import Node
 from Location import Location
 
-random.seed(1)
+#random.seed(1)
 
 files = ["IowaCityHeight2.json", "Detroit.json", "Boston.json"]
 
 for file_name in files:
 
+    # Figure out city based on name
     city = None
     if "Iowa" in file_name:
         city = "iowa"
@@ -34,15 +35,18 @@ for file_name in files:
 
     elevation_data = None
 
+    # Load in the specified cities eleatin data
     with open(file_name, "r") as f:
         elevation_data = json.load(f)['data']
 
+    # Get various utility information about the elevation
     row_count = len(elevation_data)
     column_count = len(elevation_data[0])
 
     building_size = 15
     building_radius = math.ceil( ((building_size/2)**2 + (building_size/2)**2)**0.5 )
 
+    # Flattened to get max, min, and total delta elevation
     flat_elevation = []
     for row in elevation_data: flat_elevation += row
     flat_elevation.sort()
@@ -58,27 +62,18 @@ for file_name in files:
     from PIL import Image
     import numpy as np
 
+    # Normalize the numbers to draw graphically
     def normalize(v):
         return 255 * (v - lowest_point) / elevation_delta
 
 
+    # Create a png corresponding to gray scaled elevation values
     pixels = []
     for row in reversed(elevation_data):
         pixels.append([(normalize(v), normalize(v), normalize(v)) for v in row])
-
-    #print(pixels)
-
-    # Convert the pixels into an array using numpy
     array = np.array(pixels, dtype=np.uint8)
-
-    # Use PIL to create an image from the new array of pixels
     new_image = Image.fromarray(array)
     new_image.save(f"out/elevation-generation-{city}.png")
-
-    #for i in range(len(elevation_data)):
-    #    for j in range(len(elevation_data[i])):
-    #        if elevation_data[i][j] == lowest_point:
-    #            print(f"[{i}, {j}]: {lowest_point}")
 
     # Check if this potential location is touching an existing building 
     def has_building_collisions(potential_location):
@@ -90,20 +85,21 @@ for file_name in files:
     # Check if this potential location overlaps water
     def has_water_collision(potential_location):
         covered_points = []
+        # Draw a square, then check if within the circle radius
         for y in range(potential_location.y - building_radius, potential_location.y + building_radius):
             for x in range(potential_location.x - building_radius, potential_location.x + building_radius):
                 if potential_location.distance_from(Location(y, x)) < ((2**0.5)*building_radius+2): covered_points.append(Location(y, x))
         
         print(f"Number of Covered Points {len(covered_points)}")
+        # For each relavent point, check if it was low elevation below it (likely water)
         for location in covered_points:
             covered_point_elevation = elevation_data[location.y][location.x]
             normalized_elevation = normalize(covered_point_elevation)
             if normalized_elevation < 50: return True
-        
         return False
 
+    # Get a random, safe location to create a building
     def get_random_location():
-        # Figure out water and edges later
         potential_location = Location(random.randrange(building_radius+2, row_count - building_radius - 2), random.randrange(building_radius+2, column_count - building_radius - 2))
 
         while has_building_collisions(potential_location) or has_water_collision(potential_location):
@@ -111,8 +107,7 @@ for file_name in files:
         
         return potential_location
 
-    # TODO: Check whether to start at train station or at house
-    names = [ "train", "house", "hospital", "police_station", "fire_station", "shop", "capital_building",
+    names = [ "train", "house", "hospital", "police_station", "fire_station", "shop", "capital_building", "apartment",
     "01", "02", "03", "03", "04", "05", "06", "07", "04", "05", "06", "07", "024", "025"]
     locations = []
 
@@ -176,8 +171,6 @@ for file_name in files:
         final_path.append(next_node)
         # Update current node to be the next node
         current_node = next_node
-
-    print("Okay. My Final path is")
 
     for node in final_path:
         print(node)
