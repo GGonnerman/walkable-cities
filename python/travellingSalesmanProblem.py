@@ -112,8 +112,8 @@ for file_name in files:
         return potential_location
 
     # TODO: Check whether to start at train station or at house
-    names = [ "train", "house", "hospital", "police_station", "fire_station", "shop", "capital_building", ]
-    #"01", "02", "03", "03", "04", "05", "06", "07", "04", "05", "06", "07", "024", "025"]
+    names = [ "train", "house", "hospital", "police_station", "fire_station", "shop", "capital_building",
+    "01", "02", "03", "03", "04", "05", "06", "07", "04", "05", "06", "07", "024", "025"]
     locations = []
 
     # Make a corresponding location for each name
