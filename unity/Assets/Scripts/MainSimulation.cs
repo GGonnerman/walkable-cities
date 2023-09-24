@@ -11,6 +11,7 @@ using static UnityEditor.Rendering.CameraUI;
 
 public class MainSimulation : MonoBehaviour
 {
+    public City chosenCity;
     public GameObject salesmenPrefab;
     public GameObject buildingPrefab;
     public GameObject roadPrefab;
@@ -25,8 +26,15 @@ public class MainSimulation : MonoBehaviour
     public float tolerance;
     private GameObject salesmen;
     public int salesmenCount;
-    public TextAsset jsonFile;
-    public TextAsset heightFile;
+    public TextAsset iowaPrims;
+    public TextAsset iowaElevation;
+    public Material iowaMaterial;
+    public TextAsset bostonPrims;
+    public TextAsset bostonElevation;
+    public Material bostonMaterial;
+    public TextAsset detroitPrims;
+    public TextAsset detroitElevation;
+    public Material detroidMaterial;
     private List<GameObject> samesmens = new List<GameObject>();
     private int destinationIndex = 0;
     private bool salesmenExists = true;
@@ -37,15 +45,47 @@ public class MainSimulation : MonoBehaviour
     private int elevationDelta;
     PathingData pd;
 
+    public enum City {
+        Iowa,
+        Detroit,
+        Boston
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        pd = JsonConvert.DeserializeObject<PathingData>(jsonFile.text);
-        Debug.LogError(pd.path_data[0][1]);
-        Debug.Log(pd.location_data);
-        Debug.Log(pd.list_of_edges);
+        TextAsset primsFile = null;
+        TextAsset elevationFile = null;
+        Material groundMaterial = null;
 
-        height_json = JsonConvert.DeserializeObject<HeightData>(heightFile.text);
+        if(chosenCity == City.Iowa)
+        {
+            primsFile = iowaPrims;
+            elevationFile = iowaElevation;
+            groundMaterial = iowaMaterial;
+
+        }
+        else if(chosenCity == City.Detroit)
+        {
+            primsFile = detroitPrims;
+            elevationFile = detroitElevation;
+            groundMaterial = detroidMaterial;
+        }
+        else if(chosenCity == City.Boston)
+        {
+            primsFile = bostonPrims;
+            elevationFile = bostonElevation;
+            groundMaterial = bostonMaterial;
+        }
+        else
+        {
+            Debug.LogError("No Valid City Chosen");
+        }
+
+        pd = JsonConvert.DeserializeObject<PathingData>(primsFile.text);
+        height_json = JsonConvert.DeserializeObject<HeightData>(elevationFile.text);
+        GameObject ground = GameObject.Find("Plane");
+        ground.GetComponent<MeshRenderer>().material = groundMaterial;
 
         for (int i = 0; i < height_json.data.Length; i++)
         {
@@ -85,7 +125,12 @@ public class MainSimulation : MonoBehaviour
                 //case "shop":
                 //    break;
                 case "capital_building":
-                    buildingType = capitalBuildingMaterial;
+                    if(chosenCity == City.Iowa) {
+                        buildingType = capitalBuildingMaterial;
+                    } else
+                    {
+                        buildingType = houseMaterial;
+                    }
                     break;
                 default:
                     buildingType = houseMaterial;
@@ -165,13 +210,6 @@ public class MainSimulation : MonoBehaviour
             }
 
         }
-            /*for (int j = 0; j < toHomePheromones.Length; j++)
-            {
-                if (toHomePheromones[i,j] != 0)
-                {
-                    Console.WriteLine("%f, %f: %f", i, j, toHomePheromones[i,j]);
-                }
-            }*/
     }
 
     float GetDifficulty(float start, float end)
