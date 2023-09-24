@@ -1,6 +1,6 @@
 # Walkable City
 
-![Topological Diagram of Iowa City Proper](./matlab/Finished%20Photos/IowaCityProper.png)
+![3D Grass Diagram of Boston](./assets/processed-maps/3d-grass-boston.png)
 
 ## Inspiration
 
@@ -28,4 +28,4 @@ We learned many things while working on this project. We all became much more fa
 
 ## What's next for Walkable Cities Designed Programmatically
 
-The next step for our project would be for city planning officials to more seriously consider the topic of walkable cities and their benefits for everyone involved.
+The next step for our project would be for city planning officials to more seriously consider the topic of walkable cities and their benefits for everyone involved. Thus, showing our program to as many people as possible.
