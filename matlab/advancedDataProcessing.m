@@ -1,5 +1,5 @@
 %Open and read json file containing height information
-fname = 'Boston.json'; 
+fname = 'IowaCityHeight2.json'; 
 fid = fopen(fname); 
 raw = fread(fid,inf); 
 str = char(raw'); 
@@ -19,7 +19,7 @@ axis off
 
 %Set Colors
 set(graph, 'edgecolor', 'none');
-colormap(GrassColorTwo)
+colormap(parula);
 
 %Save image
-export_fig('Boston.png', '-transparent', '-png', '-native')
+export_fig('IowaCity_Layered.png', '-transparent', '-png', '-native')
