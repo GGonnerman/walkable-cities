@@ -48,7 +48,7 @@ pixels = []
 for row in reversed(elevation_data):
     pixels.append([(normalize(v), normalize(v), normalize(v)) for v in row])
 
-print(pixels)
+#print(pixels)
 
 # Convert the pixels into an array using numpy
 array = np.array(pixels, dtype=np.uint8)
@@ -57,10 +57,10 @@ array = np.array(pixels, dtype=np.uint8)
 new_image = Image.fromarray(array)
 new_image.save('elevation-generation.png')
 
-for i in range(len(elevation_data)):
-    for j in range(len(elevation_data[i])):
-        if elevation_data[i][j] == lowest_point:
-            print(f"[{i}, {j}]: {lowest_point}")
+#for i in range(len(elevation_data)):
+#    for j in range(len(elevation_data[i])):
+#        if elevation_data[i][j] == lowest_point:
+#            print(f"[{i}, {j}]: {lowest_point}")
 
 # Check if this potential location is touching an existing building 
 def has_building_collisions(potential_location):
@@ -69,26 +69,33 @@ def has_building_collisions(potential_location):
             return True
     return False
 
+# Check if this potential location overlaps water
+def has_water_collision(potential_location):
+    covered_points = []
+    for y in range(potential_location.y - building_radius, potential_location.y + building_radius):
+        for x in range(potential_location.x - building_radius, potential_location.x + building_radius):
+            if potential_location.distance_from(Location(y, x)) < ((2**0.5)*building_radius+2): covered_points.append(Location(y, x))
+    
+    print(f"Number of Covered Points {len(covered_points)}")
+    for location in covered_points:
+        covered_point_elevation = elevation_data[location.y][location.x]
+        normalized_elevation = normalize(covered_point_elevation)
+        if normalized_elevation < 50: return True
+    
+    return False
+
 def get_random_location():
     # Figure out water and edges later
     potential_location = Location(random.randrange(building_radius, row_count - building_radius), random.randrange(building_radius, column_count - building_radius))
 
-    while has_building_collisions(potential_location):
+    while has_building_collisions(potential_location) or has_water_collision(potential_location):
         potential_location = Location(random.randrange(building_radius, row_count - building_radius), random.randrange(building_radius, column_count - building_radius))
     
     return potential_location
 
 # TODO: Check whether to start at train station or at house
-names = [ "train", "house", "hospital", "police_station", "fire_station", "shop", "capital_building", 
-"01",
-"02",
-"03",
-"04",
-"05",
-"06",
-"07",
-"024",
-"025"]
+names = [ "train", "house", "hospital", "police_station", "fire_station", "shop", "capital_building", ]
+#"01", "02", "03", "03", "04", "05", "06", "07", "04", "05", "06", "07", "024", "025"]
 locations = []
 
 # Make a corresponding location for each name
@@ -98,7 +105,7 @@ for name in names: locations.append(get_random_location())
 buildings = {}
 for name, location in zip(names, locations):
     buildings[name] = location
-    print(f"{name}: {location}")
+    #print(f"{name}: {location}")
 
 # Setup the weighted graph with correct elements
 graph = WeightedGraph()
