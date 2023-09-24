@@ -14,6 +14,7 @@ import json
 import math
 from WeightedGraph import WeightedGraph
 from Node import Node
+from Location import Location
 
 random.seed(1)
 
@@ -22,43 +23,79 @@ elevation_data = None
 with open("IowaCityHeight2.json", "r") as f:
     elevation_data = json.load(f)['data']
 
-width = len(elevation_data)
-height = len(elevation_data[0])
+row_count = len(elevation_data)
+column_count = len(elevation_data[0])
 
 building_size = 15
 building_radius = math.ceil( ((building_size/2)**2 + (building_size/2)**2)**0.5 )
 
-# Get the euclidean distance between two 2d vectors.  
-def distance_between(first_location, second_location):
-    return ( (first_location[0] - second_location[0])**2 + (first_location[1] - second_location[1])**2 )**0.5
+flat_elevation = []
+for row in elevation_data: flat_elevation += row
+flat_elevation.sort()
+
+highest_point = flat_elevation[-1]
+lowest_point = flat_elevation[0]
+elevation_delta = (highest_point - lowest_point)
+
+from PIL import Image
+import numpy as np
+
+def normalize(v):
+    return 255 * (v - lowest_point) / elevation_delta
+
+
+pixels = []
+for row in reversed(elevation_data):
+    pixels.append([(normalize(v), normalize(v), normalize(v)) for v in row])
+
+#print(pixels)
+
+# Convert the pixels into an array using numpy
+array = np.array(pixels, dtype=np.uint8)
+
+# Use PIL to create an image from the new array of pixels
+new_image = Image.fromarray(array)
+new_image.save('elevation-generation.png')
+
+#for i in range(len(elevation_data)):
+#    for j in range(len(elevation_data[i])):
+#        if elevation_data[i][j] == lowest_point:
+#            print(f"[{i}, {j}]: {lowest_point}")
 
 # Check if this potential location is touching an existing building 
 def has_building_collisions(potential_location):
     for location in locations:
-        if distance_between(location, potential_location) < (2.1*building_radius):
+        if location.distance_from(potential_location) < (2.1*building_radius):
             return True
+    return False
+
+# Check if this potential location overlaps water
+def has_water_collision(potential_location):
+    covered_points = []
+    for y in range(potential_location.y - building_radius, potential_location.y + building_radius):
+        for x in range(potential_location.x - building_radius, potential_location.x + building_radius):
+            if potential_location.distance_from(Location(y, x)) < ((2**0.5)*building_radius+2): covered_points.append(Location(y, x))
+    
+    print(f"Number of Covered Points {len(covered_points)}")
+    for location in covered_points:
+        covered_point_elevation = elevation_data[location.y][location.x]
+        normalized_elevation = normalize(covered_point_elevation)
+        if normalized_elevation < 50: return True
+    
     return False
 
 def get_random_location():
     # Figure out water and edges later
-    potential_location = [random.randrange(building_radius, height - building_radius), random.randrange(building_radius, width - building_radius)]
+    potential_location = Location(random.randrange(building_radius, row_count - building_radius), random.randrange(building_radius, column_count - building_radius))
 
-    while has_building_collisions(potential_location):
-        potential_location = [random.randrange(building_radius, height - building_radius), random.randrange(building_radius, width - building_radius)]
+    while has_building_collisions(potential_location) or has_water_collision(potential_location):
+        potential_location = Location(random.randrange(building_radius, row_count - building_radius), random.randrange(building_radius, column_count - building_radius))
     
     return potential_location
 
 # TODO: Check whether to start at train station or at house
-names = [ "train", "house", "hospital", "police_station", "fire_station", "shop", "capital_building", 
-"01",
-"02",
-"03",
-"04",
-"05",
-"06",
-"07",
-"024",
-"025"]
+names = [ "train", "house", "hospital", "police_station", "fire_station", "shop", "capital_building", ]
+#"01", "02", "03", "03", "04", "05", "06", "07", "04", "05", "06", "07", "024", "025"]
 locations = []
 
 # Make a corresponding location for each name
@@ -68,7 +105,7 @@ for name in names: locations.append(get_random_location())
 buildings = {}
 for name, location in zip(names, locations):
     buildings[name] = location
-    print(f"{name}: {location}")
+    #print(f"{name}: {location}")
 
 # Setup the weighted graph with correct elements
 graph = WeightedGraph()
@@ -127,9 +164,13 @@ print("Okay. My Final path is")
 for node in final_path:
     print(node)
 
+serializable_buildings = {}
+for name, location in zip(names, locations):
+    serializable_buildings[name] = [location.x, location.y]
+
 final_path = {
-    "location_data": buildings,
-    "path_data": [[node.x, node.y] for node in final_path]
+    "location_data": serializable_buildings,
+    "path_data": [[node.location.x, node.location.y] for node in final_path]
 }
 
 with open("prims-algorithm.json", "w") as f:
