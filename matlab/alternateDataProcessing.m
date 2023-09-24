@@ -1,5 +1,5 @@
 %Open and read json file containing height information
-fname = 'IowaCityHeight2.json'; 
+fname = 'Detroit.json'; 
 fid = fopen(fname); 
 raw = fread(fid,inf); 
 str = char(raw'); 
