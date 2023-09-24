@@ -9,15 +9,17 @@ shop
 Capital building (iowa city specific)
 """
 
-from random import randrange
+import random
 import json
 import math
 from WeightedGraph import WeightedGraph
 from Node import Node
 
+random.seed(1)
+
 elevation_data = None
 
-with open("elevationData2.json", "r") as f:
+with open("IowaCityHeight2.json", "r") as f:
     elevation_data = json.load(f)['data']
 
 width = len(elevation_data)
@@ -26,27 +28,52 @@ height = len(elevation_data[0])
 building_size = 15
 building_radius = math.ceil( ((building_size/2)**2 + (building_size/2)**2)**0.5 )
 
+# Get the euclidean distance between two 2d vectors.  
+def distance_between(first_location, second_location):
+    return ( (first_location[0] - second_location[0])**2 + (first_location[1] - second_location[1])**2 )**0.5
+
+# Check if this potential location is touching an existing building 
+def has_building_collisions(potential_location):
+    for location in locations:
+        if distance_between(location, potential_location) < (2.1*building_radius):
+            return True
+    return False
+
 def get_random_location():
     # Figure out water and edges later
-    return [randrange(building_radius, height - building_radius), randrange(building_radius, width - building_radius)]
+    potential_location = [random.randrange(building_radius, height - building_radius), random.randrange(building_radius, width - building_radius)]
 
-locations = { # TODO: Check whether to start at train station or at house
-    "train": get_random_location(),
-    "house": get_random_location(),
-    "hospital": get_random_location(),
-    "police_station": get_random_location(),
-    "fire_station": get_random_location(),
-    "shop": get_random_location(),
-    "capital_building": get_random_location(),
-}
+    while has_building_collisions(potential_location):
+        potential_location = [random.randrange(building_radius, height - building_radius), random.randrange(building_radius, width - building_radius)]
+    
+    return potential_location
 
-for key in locations:
-    print(f"{key}: {locations[key]}")
+# TODO: Check whether to start at train station or at house
+names = [ "train", "house", "hospital", "police_station", "fire_station", "shop", "capital_building", 
+"01",
+"02",
+"03",
+"04",
+"05",
+"06",
+"07",
+"024",
+"025"]
+locations = []
+
+# Make a corresponding location for each name
+for name in names: locations.append(get_random_location())
+
+# Pair the names and locations into a buildings dict
+buildings = {}
+for name, location in zip(names, locations):
+    buildings[name] = location
+    print(f"{name}: {location}")
 
 # Setup the weighted graph with correct elements
 graph = WeightedGraph()
-for key in locations:
-    graph.add_node(Node(locations[key], key))
+for key in buildings:
+    graph.add_node(Node(buildings[key], key))
 
 # Implementation of Prims Algorithm
 chosen_path = []
@@ -101,7 +128,7 @@ for node in final_path:
     print(node)
 
 final_path = {
-    "location_data": locations,
+    "location_data": buildings,
     "path_data": [[node.x, node.y] for node in final_path]
 }
 
