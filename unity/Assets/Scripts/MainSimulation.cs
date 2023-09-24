@@ -26,6 +26,7 @@ public class MainSimulation : MonoBehaviour
     public Material apartmentMaterial;
     public Material capitalBuildingMaterial;
     public Material gardnerMuseumMaterial;
+    public Material fisherMaterial;
     public float speed;
     public float tolerance;
     private GameObject salesmen;
@@ -151,7 +152,7 @@ public class MainSimulation : MonoBehaviour
                     }
                     else
                     {
-                        buildingType = houseMaterial;
+                        buildingType = fisherMaterial;
                     }
                     break;
                 default:
