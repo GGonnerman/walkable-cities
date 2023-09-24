@@ -12,6 +12,13 @@ public class MainSimulation : MonoBehaviour
 {
     public GameObject antPrefab;
     public GameObject buildingPrefab;
+    public Material trainMaterial;
+    public Material houseMaterial;
+    public Material hospitalMaterial;
+    public Material policeStationMaterial;
+    public Material fireStationMaterial;
+    public Material shopMaterial;
+    public Material capitalBuildingMaterial;
     public float speed;
     public float tolerance;
     private GameObject ant;
@@ -39,7 +46,35 @@ public class MainSimulation : MonoBehaviour
             int[] location = item.Value;
             Debug.Log(location);
             Debug.Log(location[0]);
-            Instantiate(buildingPrefab, new Vector3(location[0], 0.5f, location[1]), Quaternion.identity);
+            GameObject building = Instantiate(buildingPrefab, new Vector3(location[0], 0.5f, location[1]), Quaternion.identity);
+            Material buildingType;
+
+            switch(name)
+            {
+                //case "train":
+                //    buildingType = trainMaterial;
+                case "house":
+                    buildingType = houseMaterial;
+                    break;
+                case "hospital":
+                    buildingType = hospitalMaterial;
+                    break;
+                case "police_station":
+                    buildingType = policeStationMaterial;
+                    break;
+                //case "fire_station":
+                //    break;
+                //case "shop":
+                //    break;
+                case "capital_building":
+                    buildingType = capitalBuildingMaterial;
+                    break;
+                default:
+                    buildingType = houseMaterial;
+                    break;
+            }
+
+            building.GetComponent < MeshRenderer >().material = buildingType;
         }
 
 

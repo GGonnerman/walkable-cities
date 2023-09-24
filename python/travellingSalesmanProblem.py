@@ -30,7 +30,7 @@ def get_random_location():
     # Figure out water and edges later
     return [randrange(building_radius, height - building_radius), randrange(building_radius, width - building_radius)]
 
-locations = {
+locations = { # TODO: Check whether to start at train station or at house
     "train": get_random_location(),
     "house": get_random_location(),
     "hospital": get_random_location(),

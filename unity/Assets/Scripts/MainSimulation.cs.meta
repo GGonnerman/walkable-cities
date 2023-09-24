@@ -3,7 +3,19 @@ guid: c1f2d1b719517d4408898b1e1713a0fe
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - antPrefab: {instanceID: 0}
+  - buildingPrefab: {instanceID: 0}
+  - trainMaterial: {instanceID: 0}
+  - houseMaterial: {fileID: 2100000, guid: 52a723ebfcf952e4a931ea5d6939d266, type: 2}
+  - hospitalMaterial: {fileID: 2100000, guid: b199ed87c3099204dbd53106010763d9, type: 2}
+  - policeStationMaterial: {fileID: 2100000, guid: b00d20480a7ee314c83df39ec596e509,
+      type: 2}
+  - fireStationMaterial: {instanceID: 0}
+  - shopMaterial: {instanceID: 0}
+  - capitalBuildingMaterial: {fileID: 2100000, guid: 1a105210fc5e1c348943b7c607910418,
+      type: 2}
+  - jsonFile: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
