@@ -168,9 +168,19 @@ serializable_buildings = {}
 for name, location in zip(names, locations):
     serializable_buildings[name] = [location.x, location.y]
 
+print("About to generate edges")
+list_of_edges = {}
+for i in range(len(final_path)-1):
+    combined_id = "_".join(sorted([final_path[i].id, final_path[i+1].id]))
+    list_of_edges[combined_id] = [[final_path[i].location.x, final_path[i].location.y], [final_path[i+1].location.x, final_path[i+1].location.y]]
+print("Generated edges")
+print(list_of_edges)
+print([list_of_edges[key] for key in list_of_edges])
+
 final_path = {
     "location_data": serializable_buildings,
-    "path_data": [[node.location.x, node.location.y] for node in final_path]
+    "path_data": [[node.location.x, node.location.y] for node in final_path],
+    "list_of_edges": [list_of_edges[key] for key in list_of_edges]
 }
 
 with open("prims-algorithm.json", "w") as f:
