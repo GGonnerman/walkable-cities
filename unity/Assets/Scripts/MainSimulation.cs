@@ -6,6 +6,7 @@ using System.Xml;
 using Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.FilePathAttribute;
 using static UnityEditor.Rendering.CameraUI;
 
 public class MainSimulation : MonoBehaviour
@@ -25,9 +26,15 @@ public class MainSimulation : MonoBehaviour
     private GameObject salesmen;
     public int salesmenCount;
     public TextAsset jsonFile;
+    public TextAsset heightFile;
     private List<GameObject> samesmens = new List<GameObject>();
     private int destinationIndex = 0;
     private bool salesmenExists = true;
+    HeightData height_json;
+    private int[][] height_data;
+    private int highestPoint = -1;
+    private int lowestPoint = 20000;
+    private int elevationDelta;
     PathingData pd;
 
     // Start is called before the first frame update
@@ -37,6 +44,18 @@ public class MainSimulation : MonoBehaviour
         Debug.LogError(pd.path_data[0][1]);
         Debug.Log(pd.location_data);
         Debug.Log(pd.list_of_edges);
+
+        height_json = JsonConvert.DeserializeObject<HeightData>(heightFile.text);
+
+        for (int i = 0; i < height_json.data.Length; i++)
+        {
+            for(int j = 0; j < height_json.data[i].Length; j++)
+            {
+                if (height_json.data[i][j] > highestPoint) {  highestPoint = height_json.data[i][j]; }
+                if (height_json.data[i][j] < lowestPoint) {  lowestPoint = height_json.data[i][j]; }
+            }
+        }
+        elevationDelta = highestPoint - lowestPoint;
 
         foreach (var item in pd.location_data)
         {
@@ -77,7 +96,16 @@ public class MainSimulation : MonoBehaviour
         }
 
         salesmen = Instantiate(salesmenPrefab, new Vector3(pd.path_data[destinationIndex][0], 1, pd.path_data[destinationIndex][1]), Quaternion.identity);
+        salesmen.GetComponent<Salesmen>().SetSpeed(speed);
         destinationIndex++;
+
+        salesmen.GetComponent<Salesmen>().SetDifficulty (
+            GetDifficulty(
+                height_json.data[ pd.path_data[destinationIndex - 1][1] ][ pd.path_data[destinationIndex - 1][1] ],
+                height_json.data[ pd.path_data[destinationIndex][1] ][ pd.path_data[destinationIndex][1] ]
+            )
+        );
+
         Debug.Log(salesmen);
 
         Debug.Log("About to print edges");
@@ -98,7 +126,6 @@ public class MainSimulation : MonoBehaviour
         Vector3 destination = new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]);
         Debug.Log(destination);
         salesmen.GetComponent<Salesmen>().SetDestination(destination);
-        salesmen.GetComponent<Salesmen>().SetSpeed(speed);
         /*for(int i = 0;  i < antCount; i++)
         {
             GameObject salesmen = Instantiate(salesmenPrefab, new Vector3(0, 0, 0), Quaternion.identity);
@@ -127,6 +154,13 @@ public class MainSimulation : MonoBehaviour
                 else
                 {
                     salesmen.GetComponent<Salesmen>().SetDestination(new Vector3(pd.path_data[destinationIndex][0], 0.5f, pd.path_data[destinationIndex][1]));
+
+                    salesmen.GetComponent<Salesmen>().SetDifficulty (
+                        GetDifficulty(
+                            height_json.data[ pd.path_data[destinationIndex - 1][1] ][ pd.path_data[destinationIndex - 1][0] ],
+                            height_json.data[ pd.path_data[destinationIndex][1] ][ pd.path_data[destinationIndex][0] ]
+                        )
+                    );
                 }
             }
 
@@ -138,5 +172,12 @@ public class MainSimulation : MonoBehaviour
                     Console.WriteLine("%f, %f: %f", i, j, toHomePheromones[i,j]);
                 }
             }*/
+    }
+
+    float GetDifficulty(float start, float end)
+    {
+        Debug.Log(string.Format($"{start} start, {end} end"));
+        float scaled_incline = ((end - start) / elevationDelta);
+        return scaled_incline;
     }
 }

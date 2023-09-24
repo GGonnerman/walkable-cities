@@ -37,6 +37,10 @@ highest_point = flat_elevation[-1]
 lowest_point = flat_elevation[0]
 elevation_delta = (highest_point - lowest_point)
 
+Location.elevation_data = elevation_data
+Location.elevation_delta = elevation_delta
+Location.lowest_elevation = lowest_point
+
 from PIL import Image
 import numpy as np
 

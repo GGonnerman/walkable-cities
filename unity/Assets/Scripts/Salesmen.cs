@@ -1,13 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEditor.UI;
 using UnityEngine;
 
 public class Salesmen : MonoBehaviour
 {
 
-    private float speed = 10f;
+    private float speed = 20f;
+    private float augmentedSpeed = 20f;
     private float tolerance = 1f;
     private Vector3 destination;
     // Start is called before the first frame update
@@ -51,9 +53,9 @@ public class Salesmen : MonoBehaviour
 
         float angle = transform.rotation.eulerAngles.y * Mathf.PI / 180;
         transform.position += new Vector3(
-            Mathf.Cos(angle) * speed * Time.deltaTime,
+            Mathf.Cos(angle) * augmentedSpeed * Time.deltaTime,
             0,
-            -Mathf.Sin(angle) * speed * Time.deltaTime
+            -Mathf.Sin(angle) * augmentedSpeed * Time.deltaTime
         );
         // TODO: Check for overflow
         // x = sin(angle) * speed * deltaTime
@@ -76,6 +78,12 @@ public class Salesmen : MonoBehaviour
         this.destination = destination;
         Debug.Log("Set destionation to " + destination);
         LookAt(destination);
+    }
+
+    public void SetDifficulty(float difficulty)
+    {
+        augmentedSpeed = speed + 0.5f * difficulty * speed;
+        Debug.Log("Difficult set to " + difficulty.ToString() + "meaning augmented speed is " + augmentedSpeed.ToString() );
     }
 
     public bool IsAtDestination()

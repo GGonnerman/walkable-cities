@@ -211,7 +211,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 125, y: 250, z: 125}
+  m_LocalPosition: {x: 125, y: 230, z: 125}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -273,7 +273,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1f2d1b719517d4408898b1e1713a0fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  salesmenPrefab: {fileID: 0}
+  salesmenPrefab: {fileID: 6457003073317570254, guid: 581d6ed653af41b4e92b3616cf55fd63,
+    type: 3}
   buildingPrefab: {fileID: 1845716697551358984, guid: c334d008474a7174ab781940fa704c98,
     type: 3}
   roadPrefab: {fileID: 6526799647999082526, guid: ff1712d10508b0d40823df608b40986d,
@@ -289,8 +290,9 @@ MonoBehaviour:
     type: 2}
   speed: 20
   tolerance: 2.5
-  salesmenCount: 0
+  salesmenCount: 1
   jsonFile: {fileID: 4900000, guid: 1eee6dd95f44b2142928e1cf56a7b5f6, type: 3}
+  heightFile: {fileID: 4900000, guid: 5e932defe16a1ca45a18d51b1385c00f, type: 3}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
