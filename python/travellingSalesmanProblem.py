@@ -29,6 +29,39 @@ column_count = len(elevation_data[0])
 building_size = 15
 building_radius = math.ceil( ((building_size/2)**2 + (building_size/2)**2)**0.5 )
 
+flat_elevation = []
+for row in elevation_data: flat_elevation += row
+flat_elevation.sort()
+
+highest_point = flat_elevation[-1]
+lowest_point = flat_elevation[0]
+elevation_delta = (highest_point - lowest_point)
+
+from PIL import Image
+import numpy as np
+
+def normalize(v):
+    return 255 * (v - lowest_point) / elevation_delta
+
+
+pixels = []
+for row in reversed(elevation_data):
+    pixels.append([(normalize(v), normalize(v), normalize(v)) for v in row])
+
+print(pixels)
+
+# Convert the pixels into an array using numpy
+array = np.array(pixels, dtype=np.uint8)
+
+# Use PIL to create an image from the new array of pixels
+new_image = Image.fromarray(array)
+new_image.save('elevation-generation.png')
+
+for i in range(len(elevation_data)):
+    for j in range(len(elevation_data[i])):
+        if elevation_data[i][j] == lowest_point:
+            print(f"[{i}, {j}]: {lowest_point}")
+
 # Check if this potential location is touching an existing building 
 def has_building_collisions(potential_location):
     for location in locations:
