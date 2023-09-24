@@ -23,7 +23,7 @@ elevation = band.ReadAsArray()
 elevation = (np.round(elevation, 0)).astype(int)
 
 #Zoom in photo
-elevation = elevation[3500:7000, 3500:7000]
+elevation = elevation[10250:10500, 5000:5250]
 
 #Transforms from numpy to list
 elevation_list = elevation.tolist()
